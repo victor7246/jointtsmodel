@@ -312,6 +312,24 @@ class RJST(BaseEstimator):
         normalize_n_dt = self._unnormalized_transform().copy()
         normalize_n_dt /= normalize_n_dt.sum(1)[:,np.newaxis]
         return normalize_n_dt
+
+    def fit_transform(self, X, lexicon_dict, rerun=False, max_iter=None):
+        """Fit and transform data according to fitted model.
+        Parameters
+        ----------
+        X : array-like, shape=(n_docs, vocabSize)
+            Document word matrix.
+        lexicon_dict : dict
+            Dictionary of word lexicons with sentiment score
+        rerun: bool (default=False)
+            If True then we do not re initialize the model
+        max_iter : int, optional (default=None)
+        Returns
+        -------
+        doc_topic_distr : shape=(n_samples, n_topic_components)
+            Document topic distribution for X.
+        """
+        return self.fit(X, lexicon_dict, rerun=rerun, max_iter=max_iter).transform()
     
     def pi(self):
         """Document-topic-sentiment distribution according to fitted model.

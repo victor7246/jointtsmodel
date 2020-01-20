@@ -26,13 +26,13 @@ class BaseEstimator:
         Number of sentiments.
     doc_topic_prior : float, optional (default=None)
         Prior of document topic distribution `theta`. If the value is None,
-        defaults to `1 / n_topic_components`. Applicable for RJST and sLDA models.
+        defaults to `1 / n_topic_components`. Applicable for RJST, TSM and sLDA models.
     doc_sentiment_prior : float, optional (default=None)
         Prior of document sentiment distribution `theta`. If the value is None,
         defaults to `1 / n_sentiment_components`. Applicable for JST model.
     doc_topic_sentiment_prior : float, optional (default=None)
         Prior of document topic-sentiment distribution `pi`. If the value is None,
-        defaults to `1 / n_sentiment_components`. Applicable for RJST and sLDA models.
+        defaults to `1 / n_sentiment_components`. Applicable for RJST, TSM and sLDA models.
     doc_sentiment_topic_prior : float, optional (default=None)
         Prior of document topic-sentiment distribution `pi`. If the value is None,
         defaults to `1 / n_topic_components`. Applicable for only JST model.
@@ -69,13 +69,13 @@ class BaseEstimator:
         ``model.components_ / model.components_.sum(axis=0)[np.newaxis,:,:]``.
     doc_topic_prior_ : float
         Prior of document topic distribution `theta`. If the value is None,
-        it is `1 / n_topic_components`. Applicable for RJST and sLDA models.
+        it is `1 / n_topic_components`. Applicable for RJST, TSM and sLDA models.
     doc_sentiment_prior_ : float
         Prior of document sentiment distribution `theta`. If the value is None,
         it is `1 / n_sentiment_components`. Applicable for JST model.
     doc_topic_sentiment_prior_ : float
         Prior of document-topic-sentiment distribution `pi`. If the value is None,
-        it is `1 / n_sentiment_components`. Applicable for RJST and sLDA models.
+        it is `1 / n_sentiment_components`. Applicable for RJST, TSM and sLDA models.
     doc_sentiment_topic_prior_ : float
         Prior of document-sentiment-topics distribution `pi`. If the value is None,
         it is `1 / n_topic_components`. Applicable for JST model.
@@ -343,7 +343,7 @@ class BaseEstimator:
         Returns
         -------
         doc_topic_distr : shape=(n_samples, n_topic_components)
-            Document topic distribution for X. Applicable for RJST and sLDA.
+            Document topic distribution for X. Applicable for RJST, TSM and sLDA.
         doc_sentiment_distr : shape=(n_samples, n_sentiment_components)
             Document sentiment distribution for X. Applicable for JST.
         """
@@ -354,29 +354,18 @@ class BaseEstimator:
         Returns
         -------
         doc_topic_distr : shape=(n_samples, n_topic_components)
-            Document topic distribution for X. Applicable for RJST and sLDA.
+            Document topic distribution for X. Applicable for RJST, TSM and sLDA.
         doc_sentiment_distr : shape=(n_samples, n_sentiment_components)
             Document sentiment distribution for X. Applicable for JST.
         """
         raise NotImplementedError
-
-    def fit_transform(self, **fit_params):
-        """Fit and transform data according to fitted model.
-        Returns
-        -------
-        doc_topic_distr : shape=(n_samples, n_topic_components)
-            Document topic distribution for X. Applicable for RJST and sLDA.
-        doc_sentiment_distr : shape=(n_samples, n_sentiment_components)
-            Document sentiment distribution for X. Applicable for JST.
-        """
-        return self.fit(X, **fit_params).transform()
     
     def pi(self):
         """Document-topic-sentiment distribution according to fitted model.
         Returns
         -------
         doc_topic_sentiment_dstr : shape=(n_samples, n_topic_components, n_sentiment_components)
-            Document-sentiment-topic distribution for X. Applicable for RJST and sLDA.
+            Document-sentiment-topic distribution for X. Applicable for RJST, TSM and sLDA.
         doc_sentiment_topic_dstr : shape=(n_samples, n_sentiment_components, n_topic_components)
             Document-sentiment-topic distribution for X. Applicable for JST.
         """
