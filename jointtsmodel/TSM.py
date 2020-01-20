@@ -101,10 +101,10 @@ class TSM(BaseEstimator):
     >>> lexicon_data = pd.read_excel('../lexicon/prior_sentiment.xlsx')
     >>> lexicon_data = lexicon_data.dropna()
     >>> lexicon_dict = dict(zip(lexicon_data['Word'],lexicon_data['Sentiment']))
-    >>> model = RJST(n_topic_components=5,n_sentiment_components=5,
+    >>> model = TSM(n_topic_components=5,n_sentiment_components=5,
     ...     random_state=0)
     >>> model.fit(X.toarray(), lexicon_dict)
-    RJST(...)
+    TSM(...)
     >>> # get topics for some given samples:
     >>> model.transform()[:2]
     array([[0.00360392, 0.25499205, 0.0036211 , 0.64236448, 0.09541846],
