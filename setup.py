@@ -9,7 +9,7 @@ with open('README.md', encoding='utf-8') as f:
 if __name__ == "__main__":
     setup(
         name="jointtsmodel",
-        version="0.3",
+        version="1.1",
         description="jointtsmodel - library of joint topic-sentiment models",
         long_description=long_description,
         long_description_content_type='text/markdown',

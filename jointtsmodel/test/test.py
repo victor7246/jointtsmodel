@@ -11,6 +11,7 @@ Testing of joint topic-sentiment models
 from jointtsmodel.RJST import RJST
 from jointtsmodel.JST import JST
 from jointtsmodel.sLDA import sLDA
+from jointtsmodel.TSM import TSM
 
 import pandas as pd
 import numpy as np
@@ -35,6 +36,16 @@ lexicon_dict = dict(zip(lexicon_data['Word'],lexicon_data['Sentiment']))
 
 ### RJST model ###
 model = RJST(n_topic_components=5,n_sentiment_components=5,random_state=123,evaluate_every=2)
+model.fit(X.toarray(), lexicon_dict)
+
+model.transform()[:2]
+
+top_words = list(model.getTopKWords(vocabulary).values())
+coherence_score_uci(X.toarray(),inv_vocabulary,top_words)
+Hscore(model.transform())
+
+### TSM ###
+model = TSM(n_topic_components=5,n_sentiment_components=5,random_state=123,evaluate_every=2)
 model.fit(X.toarray(), lexicon_dict)
 
 model.transform()[:2]

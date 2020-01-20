@@ -36,7 +36,7 @@ class RJST(BaseEstimator):
         Prior of document topic distribution `theta`. If the value is None,
         defaults to `1 / n_topic_components`.
     doc_topic_sentiment_prior : float, optional (default=None)
-        Prior of document topic-sentiment distribution `phi`. If the value is None,
+        Prior of document topic-sentiment distribution `pi`. If the value is None,
         defaults to `1 / n_sentiment_components`.
     topic_sentiment_word_prior : float, optional (default=None)
         Prior of topic-sentiment word distribution `beta`. If the value is None, defaults
@@ -73,14 +73,15 @@ class RJST(BaseEstimator):
         Prior of document topic distribution `theta`. If the value is None,
         it is `1 / n_topic_components`.
     doc_topic_sentiment_prior_ : float
-        Prior of document-topic-sentiment distribution `phi`. If the value is None,
+        Prior of document-topic-sentiment distribution `pi`. If the value is None,
         it is `1 / n_sentiment_components`.
     topic_sentiment_word_prior_ : float
         Prior of topic-sentiment-word distribution `beta`. If the value is None, it is
         `1 / (n_topic_components * n_sentiment_components)`.
     Examples
     --------
-    >>> from jointtsmodels import RJST
+    >>> from jointtsmodels.RJST import RJST
+    >>> from jointtsmodels.utils import coherence_score_uci
     >>> import pandas as pd
     >>> import numpy as np
     >>> from sklearn.feature_extraction.text import CountVectorizer
@@ -312,7 +313,7 @@ class RJST(BaseEstimator):
         normalize_n_dt /= normalize_n_dt.sum(1)[:,np.newaxis]
         return normalize_n_dt
     
-    def phi(self):
+    def pi(self):
         """Document-topic-sentiment distribution according to fitted model.
         Returns
         -------

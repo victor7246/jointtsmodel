@@ -6,7 +6,7 @@ This is a consolidated library for joint topic-sentiment models.
 
 ### Description
 
-Joint topic-sentiment models extract topical as well as sentiment information for each text. This library contains 3 different jst models - JST, RJST and sLDA.
+Joint topic-sentiment models extract topical as well as sentiment information for each text. This library contains 4 different jst models - JST, RJST, TSM and sLDA.
 
 References -
 
@@ -14,9 +14,13 @@ References -
     
     [2] https://www.aaai.org/ocs/index.php/AAAI/AAAI10/paper/viewFile/1913/2215
     
-    [3] https://github.com/ayushjain91/Sentiment-LDA
+    [3] https://hal.archives-ouvertes.fr/hal-02052354/document
+
+    [4] https://github.com/ayushjain91/Sentiment-LDA
     
-    [4] https://gist.github.com/mblondel/542786
+    [5] https://gist.github.com/mblondel/542786
+
+
     
 ### Installation
 
@@ -40,6 +44,7 @@ We can use vectorized texts to run joint topic-sentiment models.
 from jointtsmodel.RJST import RJST
 from jointtsmodel.JST import JST
 from jointtsmodel.sLDA import sLDA
+from jointtsmodel.TSM import TSM
 
 import pandas as pd
 import numpy as np
@@ -79,6 +84,18 @@ Hscore(model.transform())
 For RJST model use
 ```
 model = RJST(n_topic_components=5,n_sentiment_components=5,random_state=123,evaluate_every=2)
+model.fit(X.toarray(), lexicon_dict)
+
+model.transform()[:2]
+
+top_words = list(model.getTopKWords(vocabulary).values())
+coherence_score_uci(X.toarray(),inv_vocabulary,top_words)
+Hscore(model.transform())
+```
+
+For TSM use
+```
+model = TSM(n_topic_components=5,n_sentiment_components=5,random_state=123,evaluate_every=2)
 model.fit(X.toarray(), lexicon_dict)
 
 model.transform()[:2]

@@ -31,10 +31,10 @@ class BaseEstimator:
         Prior of document sentiment distribution `theta`. If the value is None,
         defaults to `1 / n_sentiment_components`. Applicable for JST model.
     doc_topic_sentiment_prior : float, optional (default=None)
-        Prior of document topic-sentiment distribution `phi`. If the value is None,
+        Prior of document topic-sentiment distribution `pi`. If the value is None,
         defaults to `1 / n_sentiment_components`. Applicable for RJST and sLDA models.
     doc_sentiment_topic_prior : float, optional (default=None)
-        Prior of document topic-sentiment distribution `phi`. If the value is None,
+        Prior of document topic-sentiment distribution `pi`. If the value is None,
         defaults to `1 / n_topic_components`. Applicable for only JST model.
     topic_sentiment_word_prior : float, optional (default=None)
         Prior of topic-sentiment word distribution `beta`. If the value is None, defaults
@@ -74,10 +74,10 @@ class BaseEstimator:
         Prior of document sentiment distribution `theta`. If the value is None,
         it is `1 / n_sentiment_components`. Applicable for JST model.
     doc_topic_sentiment_prior_ : float
-        Prior of document-topic-sentiment distribution `phi`. If the value is None,
+        Prior of document-topic-sentiment distribution `pi`. If the value is None,
         it is `1 / n_sentiment_components`. Applicable for RJST and sLDA models.
     doc_sentiment_topic_prior_ : float
-        Prior of document-sentiment-topics distribution `phi`. If the value is None,
+        Prior of document-sentiment-topics distribution `pi`. If the value is None,
         it is `1 / n_topic_components`. Applicable for JST model.
     topic_sentiment_word_prior_ : float
         Prior of topic-sentiment-word distribution `beta`. If the value is None, it is
@@ -359,8 +359,19 @@ class BaseEstimator:
             Document sentiment distribution for X. Applicable for JST.
         """
         raise NotImplementedError
+
+    def fit_transform(self, **fit_params):
+        """Fit and transform data according to fitted model.
+        Returns
+        -------
+        doc_topic_distr : shape=(n_samples, n_topic_components)
+            Document topic distribution for X. Applicable for RJST and sLDA.
+        doc_sentiment_distr : shape=(n_samples, n_sentiment_components)
+            Document sentiment distribution for X. Applicable for JST.
+        """
+        return self.fit(X, **fit_params).transform()
     
-    def phi(self):
+    def pi(self):
         """Document-topic-sentiment distribution according to fitted model.
         Returns
         -------

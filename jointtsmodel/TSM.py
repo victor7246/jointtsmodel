@@ -2,11 +2,10 @@
 (c) Ayan Sengupta - 2020
 License: MIT License
 
-Implementation of sLDA (Sentiment Joint Sentiment-Topic model)
+Implementation of TS Model (Topic-Sentiment Model)
 
 Reference
-    [1] https://www.aaai.org/ocs/index.php/AAAI/AAAI10/paper/viewFile/1913/2215
-    [2] https://github.com/ayushjain91/Sentiment-LDA
+    [1] https://hal.archives-ouvertes.fr/hal-02052354/document
 
 """
 
@@ -20,13 +19,12 @@ from sklearn.utils.validation import check_is_fitted, check_non_negative, check_
 import numpy as np
 import scipy
 from scipy.special import gammaln, psi
-from nltk.corpus import sentiwordnet as swn
 from .base import BaseEstimator
 from .utils import sampleFromDirichlet, sampleFromCategorical, log_multi_beta, word_indices
 from .utils import coherence_score_uci, coherence_score_umass, symmetric_kl_score, Hscore
 
-class sLDA(BaseEstimator):
-    """Sentiment LDA model
+class TSM(BaseEstimator):
+    """Reverse JST model
     
     Parameters
     ----------
@@ -82,8 +80,10 @@ class sLDA(BaseEstimator):
         `1 / (n_topic_components * n_sentiment_components)`.
     Examples
     --------
-    >>> from jointtsmodels.sLDA import sLDA
+    >>> from jointtsmodels.TSM import TSM
     >>> from jointtsmodels.utils import coherence_score_uci
+    >>> import pandas as pd
+    >>> import numpy as np
     >>> from sklearn.feature_extraction.text import CountVectorizer
     >>> from sklearn.datasets import fetch_20newsgroups
     >>> # This produces a feature matrix of token counts, similar to what
@@ -98,10 +98,13 @@ class sLDA(BaseEstimator):
     >>> X = vectorizer.fit_transform(data)
     >>> vocabulary = vectorizer.get_feature_names()
     >>> inv_vocabulary = dict(zip(vocabulary,np.arange(len(vocabulary))))
-    >>> model = sLDA(n_topic_components=5,n_sentiment_components=5,
+    >>> lexicon_data = pd.read_excel('../lexicon/prior_sentiment.xlsx')
+    >>> lexicon_data = lexicon_data.dropna()
+    >>> lexicon_dict = dict(zip(lexicon_data['Word'],lexicon_data['Sentiment']))
+    >>> model = RJST(n_topic_components=5,n_sentiment_components=5,
     ...     random_state=0)
-    >>> model.fit(X.toarray(), vocabulary)
-    sLDA(...)
+    >>> model.fit(X.toarray(), lexicon_dict)
+    RJST(...)
     >>> # get topics for some given samples:
     >>> model.transform()[:2]
     array([[0.00360392, 0.25499205, 0.0036211 , 0.64236448, 0.09541846],
@@ -112,7 +115,7 @@ class sLDA(BaseEstimator):
            
     Reference
     ---------
-        [1] https://www.aaai.org/ocs/index.php/AAAI/AAAI10/paper/viewFile/1913/2215
+        [1] https://hal.archives-ouvertes.fr/hal-02052354/document
     
     Notes
     -----
@@ -131,14 +134,14 @@ class sLDA(BaseEstimator):
                  topic_sentiment_word_prior=topic_sentiment_word_prior, max_iter=max_iter,
                  prior_update_step=prior_update_step, evaluate_every=evaluate_every, verbose=verbose, random_state=random_state)
         
-    def _initialize_(self, X, vocabulary):
+    def _initialize_(self, X, lexicon_dict):
         """Initialize fit variables
         Parameters
         ----------
         X : array-like, shape=(n_docs, vocabSize)
             Document word matrix.
-        vocabulary : list
-            List of words from vectorizer
+        lexicon_dict : dict
+            Dictionary of word lexicons with sentiment score
         Returns
         -------
         self
@@ -152,28 +155,18 @@ class sLDA(BaseEstimator):
 
         # Pseudocounts
         self.n_dt = np.zeros((n_docs, self.n_topic_components))
-        self.n_dts = np.zeros((n_docs,self.n_topic_components, self.n_sentiment_components))
         self.n_d = np.zeros((n_docs))
         self.n_vts = np.zeros((vocabSize, self.n_topic_components, self.n_sentiment_components))
         self.n_ts = np.zeros((self.n_topic_components, self.n_sentiment_components))
+        self.n_t = np.zeros((self.n_topic_components))
 
         self.topics = {}
         self.sentiments = {}
-        self.priorSentiment = {}
-        
+
         self.alphaVec = self.doc_topic_prior_.copy()
         self.gammaVec = self.doc_topic_sentiment_prior_
         self.beta = self.topic_sentiment_word_prior_
-        
-        for i, word in enumerate(vocabulary):
-            synsets = swn.senti_synsets(word)
-            posScore = np.mean([s.pos_score() for s in synsets])
-            negScore = np.mean([s.neg_score() for s in synsets])
-            if posScore >= 0.1 and posScore > negScore:
-                self.priorSentiment[i] = 1
-            elif negScore >= 0.1 and negScore > posScore:
-                self.priorSentiment[i] = 0
-                
+
         for d in range(n_docs):
             
             topicDistribution = sampleFromDirichlet(self.alphaVec)
@@ -184,14 +177,16 @@ class sLDA(BaseEstimator):
                
                    t = sampleFromCategorical(topicDistribution)
                    s = sampleFromCategorical(sentimentDistribution[t, :])
+                  
+                   prior_sentiment = lexicon_dict.get(w,1)
                    
                    self.topics[(d, i)] = t
                    self.sentiments[(d, i)] = s
                    self.n_dt[d,t]+=1
-                   self.n_dts[d,t,s] += 1
                    self.n_d[d] += 1
-                   self.n_vts[w, t, s] += 1
+                   self.n_vts[w, t, s*prior_sentiment] += 1
                    self.n_ts[t, s] += 1
+                   self.n_t[t] += 1
     
     def conditionalDistribution(self, d, v):
         """
@@ -213,8 +208,8 @@ class sLDA(BaseEstimator):
         
         secondFactor = np.zeros((self.n_topic_components,self.n_sentiment_components))
         for k in range(self.n_topic_components):
-            secondFactor[k,:] = (self.n_dts[d, k, :] + self.gammaVec) / \
-                (self.n_dt[d, k] + np.sum(self.gammaVec))
+            secondFactor[k,:] = (self.n_ts[k, :] + self.gammaVec) / \
+                (self.n_t[k] + np.sum(self.gammaVec))
         thirdFactor = (self.n_vts[v, :, :] + self.beta) / \
             (self.n_ts + self.n_vts.shape[0] * self.beta)
         probabilities_ts *= firstFactor[:, np.newaxis]
@@ -223,14 +218,14 @@ class sLDA(BaseEstimator):
         
         return probabilities_ts
         
-    def fit(self, X, vocabulary, rerun=False, max_iter=None):
+    def fit(self, X, lexicon_dict, rerun=False, max_iter=None):
         """Learn model for the data X with Gibbs sampling.
         Parameters
         ----------
         X : array-like, shape=(n_docs, vocabSize)
             Document word matrix.
-        vocabulary : list
-            List of words from vectorizer
+        lexicon_dict : dict
+            Dictionary of word lexicons with sentiment score
         rerun: bool (default=False)
             If True then we do not re initialize the model
         max_iter : int, optional (default=None)
@@ -239,10 +234,9 @@ class sLDA(BaseEstimator):
         self
         """
         if rerun == False:
-            self._initialize_(X, vocabulary)
+            self._initialize_(X, lexicon_dict)
             
         self.wordOccurenceMatrix = self._check_non_neg_array(self.wordOccurenceMatrix, "JST.fit")
-        n_docs, vocabSize = self.wordOccurenceMatrix.shape
         if max_iter is None:
             max_iter = self.max_iter
         
@@ -254,28 +248,24 @@ class sLDA(BaseEstimator):
                 for i, v in enumerate(word_indices(self.wordOccurenceMatrix[d, :])):
                     t = self.topics[(d, i)]
                     s = self.sentiments[(d, i)]
+                    prior_sentiment = lexicon_dict.get(v,1)
                     self.n_dt[d,t]-=1
-                    self.n_d[d] -= 1
-                    self.n_dts[d,t,s] -= 1
-                    self.n_vts[v, t, s] -= 1
+                    self.n_d[d] -= 1 
+                    self.n_vts[v, t, s*prior_sentiment] -= 1
                     self.n_ts[t, s] -= 1
+                    self.n_t[t] -= 1
 
                     probabilities_ts = self.conditionalDistribution(d, v)
-                    
-                    if v in self.priorSentiment:
-                        s = self.priorSentiment[v]
-                        t = sampleFromCategorical(probabilities_ts[:, s])
-                    else:
-                        ind = sampleFromCategorical(probabilities_ts.flatten())
-                        t, s = np.unravel_index(ind, probabilities_ts.shape)
+                    ind = sampleFromCategorical(probabilities_ts.flatten())
+                    t, s = np.unravel_index(ind, probabilities_ts.shape)
                     
                     self.topics[(d, i)] = t
                     self.sentiments[(d, i)] = s
                     self.n_d[d] += 1
-                    self.n_dts[d,t,s] += 1
-                    self.n_vts[v, t, s] += 1
+                    self.n_vts[v, t, s*prior_sentiment] += 1
                     self.n_ts[t, s] += 1
                     self.n_dt[d,t]+=1
+                    self.n_t[t]+=1
             
             if self.prior_update_step > 0 and (iteration+1)%self.prior_update_step == 0:
                 numerator = 0
@@ -330,9 +320,9 @@ class sLDA(BaseEstimator):
         doc_topic_sentiment_dstr : shape=(n_docs, n_topic_components, n_sentiment_components)
             Document-sentiment-topic distribution for X.
         """
-        normalized_n_dts = self.n_dts.copy() + self.gammaVec
-        normalized_n_dts /= normalized_n_dts.sum(2)[:,:,np.newaxis]
-        return normalized_n_dts
+        normalized_n_ts = self.n_ts.copy() + self.gammaVec
+        normalized_n_ts /= normalized_n_ts.sum(1)[:,np.newaxis]
+        return normalized_n_ts
         
     def loglikelihood(self):
         """Calculate log-likelihood of generating the whole corpus
@@ -350,12 +340,12 @@ class sLDA(BaseEstimator):
         lik -= self.n_topic_components * self.n_sentiment_components * log_multi_beta(self.beta, vocabSize)
 
         for m in range(n_docs):
-            for k in range(self.n_topic_components):
-                lik += log_multi_beta(self.n_dts[m, k, :]+self.gammaVec)
-        
             lik += log_multi_beta(self.n_dt[m,:]+self.alphaVec)
+
+        for k in range(self.n_topic_components):
+            lik += log_multi_beta(self.n_ts[k, :]+self.gammaVec)
         
-        lik -= n_docs * self.n_topic_components * log_multi_beta(self.gammaVec)
+        lik -= self.n_topic_components * log_multi_beta(self.gammaVec)
         lik -= n_docs * log_multi_beta(self.alphaVec)
     
         return lik
