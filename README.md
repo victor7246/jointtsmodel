@@ -77,7 +77,8 @@ model.fit(X.toarray(), lexicon_dict)
 model.transform()[:2]
 
 top_words = list(model.getTopKWords(vocabulary).values())
-coherence_score_uci(X.toarray(),inv_vocabulary,top_words)
+top_words_by_topic = list(model.getTopKWordsByTopic(vocabulary).values())
+coherence_score_uci(X.toarray(),inv_vocabulary,top_words_by_topic)
 Hscore(model.transform())
 ```
 
@@ -89,7 +90,8 @@ model.fit(X.toarray(), lexicon_dict)
 model.transform()[:2]
 
 top_words = list(model.getTopKWords(vocabulary).values())
-coherence_score_uci(X.toarray(),inv_vocabulary,top_words)
+top_words_by_topic = list(model.getTopKWordsByTopic(vocabulary).values())
+coherence_score_uci(X.toarray(),inv_vocabulary,top_words_by_topic)
 Hscore(model.transform())
 ```
 
@@ -101,7 +103,8 @@ model.fit(X.toarray(), lexicon_dict)
 model.transform()[:2]
 
 top_words = list(model.getTopKWords(vocabulary).values())
-coherence_score_uci(X.toarray(),inv_vocabulary,top_words)
+top_words_by_topic = list(model.getTopKWordsByTopic(vocabulary).values())
+coherence_score_uci(X.toarray(),inv_vocabulary,top_words_by_topic)
 Hscore(model.transform())
 ```
 
@@ -113,7 +116,8 @@ model.fit(X.toarray(), vocabulary)
 model.transform()[:2]
 
 top_words = list(model.getTopKWords(vocabulary).values())
-coherence_score_uci(X.toarray(),inv_vocabulary,top_words)
+top_words_by_topic = list(model.getTopKWordsByTopic(vocabulary).values())
+coherence_score_uci(X.toarray(),inv_vocabulary,top_words_by_topic)
 Hscore(model.transform())
 ```
 
