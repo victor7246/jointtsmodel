@@ -125,4 +125,6 @@ Hscore(model.transform())
 
 * Add parallelization for faster execution
 * Handle sparse matrix
-* Add online jst models
+* Add embedding based weakly supervised JST model - WS-TSWE (coming soon)
+* Add online JST models
+
