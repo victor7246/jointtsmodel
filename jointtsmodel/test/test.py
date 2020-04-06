@@ -12,6 +12,7 @@ from jointtsmodel.RJST import RJST
 from jointtsmodel.JST import JST
 from jointtsmodel.sLDA import sLDA
 from jointtsmodel.TSM import TSM
+from jointtsmodel.TSWE import TSWE
 
 import pandas as pd
 import numpy as np
@@ -67,6 +68,37 @@ Hscore(model.transform())
 ### sLDA model ###
 model = sLDA(n_topic_components=5,n_sentiment_components=5,random_state=123,evaluate_every=2)
 model.fit(X.toarray(), vocabulary)
+
+model.transform()[:2]
+
+top_words = list(model.getTopKWords(vocabulary).values())
+coherence_score_uci(X.toarray(),inv_vocabulary,top_words)
+Hscore(model.transform())
+
+### Load word embeddings for TSWE model ###
+embeddings_index = {}
+f = open('embeddings/glove.6B.100d.txt','r',encoding='utf8')
+
+for i, line in enumerate(f):
+    values = line.split()
+    word = values[0]
+    coefs = np.asarray(values[1:], dtype='float32')
+    embeddings_index[word] = coefs
+f.close()
+
+print('Found %s word vectors.' % len(embeddings_index))
+
+embedding_matrix = np.zeros((X.shape[1], 100))
+
+for i, word in enumerate(vocabulary):
+    if word in embeddings_index:
+        embedding_matrix[i] = embeddings_index[word]
+    else:
+        embedding_matrix[i] = np.zeros(100)
+
+### TSWE model ###
+model = TSWE(embedding_dim=100,n_topic_components=5,n_sentiment_components=5,random_state=123,evaluate_every=2)
+model.fit(X.toarray(), lexicon_dict, embedding_matrix)
 
 model.transform()[:2]
 

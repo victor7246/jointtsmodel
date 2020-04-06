@@ -58,7 +58,7 @@ def log_multi_beta(alpha, K=None):
     else:
         # alpha is assumed to be a scalar
         return K * scipy.special.gammaln(alpha) - scipy.special.gammaln(K*alpha)
-        
+
 def word_indices(wordOccuranceVec):
     """
     Turn a document vector of size vocab_size to a sequence

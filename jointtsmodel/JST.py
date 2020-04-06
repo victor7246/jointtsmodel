@@ -208,12 +208,12 @@ class JST(BaseEstimator):
         secondFactor = np.zeros((self.n_topic_components,self.n_sentiment_components))
         for s in range(self.n_sentiment_components):
         
-             secondFactor = ((self.n_dst[d, s, :] + self.gammaVec) / \
+             secondFactor[:,s] = ((self.n_dst[d, s, :] + self.gammaVec) / \
             (self.n_ds[d, s] + np.sum(self.gammaVec)))
         thirdFactor = (self.n_vts[v,:, :] + self.beta) / \
             (self.n_ts + self.n_vts.shape[0] * self.beta)
-        probabilities_ts = firstFactor[:, np.newaxis]
-        probabilities_ts = secondFactor * thirdFactor
+        probabilities_ts *= firstFactor[:, np.newaxis]
+        probabilities_ts *= secondFactor * thirdFactor
         probabilities_ts /= np.sum(probabilities_ts)
         
         return probabilities_ts

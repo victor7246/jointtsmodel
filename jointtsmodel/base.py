@@ -411,7 +411,7 @@ class BaseEstimator:
         worddict: dict
             Dictionary with (topic,sentiment) pair as key and list of top num_words words as value.
         """
-        #check_is_fitted(self)
+        check_is_fitted(self)
         
         if len(vocabulary) != self.wordOccurenceMatrix.shape[1]:
             raise ValueError("Length of vocabulary does not match with document-word matrix fitted by model")
@@ -422,32 +422,5 @@ class BaseEstimator:
             for s in range(self.n_sentiment_components):
                 topWordIndices = pseudocounts[:, t, s].argsort()[-1:-(num_words + 1):-1]
                 worddict[(t+1, s+1)] = [vocabulary[i] for i in topWordIndices]
-
-        return worddict
-    
-    def getTopKWordsByTopic(self, vocabulary, num_words=5):
-        """
-        Returns top num_words discriminative words for topic t based on topic_sentiment_word distribution
-        Parameters
-        ----------
-        vocabulary : list
-            list of vocabulary from vectorizer.
-        num_words: int (default=5)
-            number of words to be displayed for each topic-sentiment pair
-        Returns
-        -------
-        worddict: dict
-            Dictionary with topic as key and list of top num_words words as value.
-        """
-        #check_is_fitted(self)
-        
-        if len(vocabulary) != self.wordOccurenceMatrix.shape[1]:
-            raise ValueError("Length of vocabulary does not match with document-word matrix fitted by model")
-        
-        pseudocounts = self.components_.mean(axis=2)
-        worddict = {}
-        for t in range(self.n_topic_components):
-            topWordIndices = pseudocounts[:, t].argsort()[-1:-(num_words + 1):-1]
-            worddict[t+1] = [vocabulary[i] for i in topWordIndices]
 
         return worddict

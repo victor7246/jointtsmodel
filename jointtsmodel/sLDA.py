@@ -2,7 +2,7 @@
 (c) Ayan Sengupta - 2020
 License: MIT License
 
-Implementation of sLDA (Sentiment Joint Sentiment-Topic model)
+Implementation of sLDA (Sentiment LDA model)
 
 Reference
     [1] https://www.aaai.org/ocs/index.php/AAAI/AAAI10/paper/viewFile/1913/2215
