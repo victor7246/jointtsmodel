@@ -7,22 +7,6 @@ This is a consolidated library for joint topic-sentiment (jst) models.
 ### Description
 
 Joint topic-sentiment models extract topical as well as sentiment information for each text. This library contains different jst models - JST, RJST, TSM, sLDA and TSWE.
-
-References -
-
-    [1] https://www.researchgate.net/figure/JST-and-Reverse-JST-sentiment-classification-results-with-multiple-topics_fig1_47454505
-    
-    [2] https://www.aaai.org/ocs/index.php/AAAI/AAAI10/paper/viewFile/1913/2215
-    
-    [3] https://hal.archives-ouvertes.fr/hal-02052354/document
-
-    [4] https://github.com/ayushjain91/Sentiment-LDA
-    
-    [5] https://gist.github.com/mblondel/542786
-
-    [6] http://ceur-ws.org/Vol-1646/paper6.pdf
-
-
     
 ### Installation
 
@@ -159,3 +143,17 @@ Hscore(model.transform())
 * Add parallelization for faster execution
 * Handle sparse matrix
 * Add online JST models
+
+### References -
+
+    [1] https://www.researchgate.net/figure/JST-and-Reverse-JST-sentiment-classification-results-with-multiple-topics_fig1_47454505
+    
+    [2] https://www.aaai.org/ocs/index.php/AAAI/AAAI10/paper/viewFile/1913/2215
+    
+    [3] https://hal.archives-ouvertes.fr/hal-02052354/document
+
+    [4] https://github.com/ayushjain91/Sentiment-LDA
+    
+    [5] https://gist.github.com/mblondel/542786
+
+    [6] http://ceur-ws.org/Vol-1646/paper6.pdf
