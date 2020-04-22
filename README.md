@@ -146,14 +146,14 @@ Hscore(model.transform())
 
 ### References -
 
-    [1] https://www.researchgate.net/figure/JST-and-Reverse-JST-sentiment-classification-results-with-multiple-topics_fig1_47454505
-    
-    [2] https://www.aaai.org/ocs/index.php/AAAI/AAAI10/paper/viewFile/1913/2215
-    
-    [3] https://hal.archives-ouvertes.fr/hal-02052354/document
+[1] https://www.researchgate.net/figure/JST-and-Reverse-JST-sentiment-classification-results-with-multiple-topics_fig1_47454505
 
-    [4] https://github.com/ayushjain91/Sentiment-LDA
-    
-    [5] https://gist.github.com/mblondel/542786
+[2] https://www.aaai.org/ocs/index.php/AAAI/AAAI10/paper/viewFile/1913/2215
 
-    [6] http://ceur-ws.org/Vol-1646/paper6.pdf
+[3] https://hal.archives-ouvertes.fr/hal-02052354/document
+
+[4] https://github.com/ayushjain91/Sentiment-LDA
+
+[5] https://gist.github.com/mblondel/542786
+
+[6] http://ceur-ws.org/Vol-1646/paper6.pdf
