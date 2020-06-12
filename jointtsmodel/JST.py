@@ -210,9 +210,11 @@ class JST(BaseEstimator):
         
              secondFactor[:,s] = ((self.n_dst[d, s, :] + self.gammaVec) / \
             (self.n_ds[d, s] + np.sum(self.gammaVec)))
+
         thirdFactor = (self.n_vts[v,:, :] + self.beta) / \
             (self.n_ts + self.n_vts.shape[0] * self.beta)
-        probabilities_ts *= firstFactor[:, np.newaxis]
+
+        probabilities_ts *= firstFactor[np.newaxis,:]
         probabilities_ts *= secondFactor * thirdFactor
         probabilities_ts /= np.sum(probabilities_ts)
         

@@ -254,9 +254,9 @@ class TSWE(BaseEstimator):
         #    forthFactor[k,:] = np.exp(np.dot(self.topic_embeddings[k,:],self.word_embeddings[v,:]))/np.sum(np.exp(np.dot(self.topic_embeddings[k,:],self.word_embeddings.T)))
         
         forthFactor = np.exp(np.dot(self.topic_embeddings,self.word_embeddings[v,:]))/np.sum(np.exp(np.dot(self.topic_embeddings,self.word_embeddings.T)),-1)
-        probabilities_ts *= firstFactor[:, np.newaxis]
+        probabilities_ts *= firstFactor[np.newaxis,:]
         #probabilities_ts *= secondFactor * thirdFactor
-        probabilities_ts *= secondFactor * ((1-self.lambda_)*thirdFactor + self.lambda_*forthFactor)
+        probabilities_ts *= secondFactor * ((1-self.lambda_)*thirdFactor + self.lambda_*forthFactor[:,np.newaxis])
         probabilities_ts /= np.sum(probabilities_ts)
         
         return probabilities_ts
