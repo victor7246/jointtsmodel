@@ -124,8 +124,7 @@ def coherence_score_umass(X,inv_vocabulary,top_words):
     wordoccurances = (X > 0).astype(int)
     totalcnt = 0
     total = 0
-    for i in range(len(top_words)):
-        allwords = topic_sentiment_df.top_words.iloc[i] #ast.literal_eval(topic_sentiment_df.top_words.iloc[i])
+    for allwords in top_words:
         for word1 in allwords:
             for word2 in allwords:
                 if word1 != word2:
